@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.Resources.*;
 
@@ -13,20 +12,20 @@ public class PluralResources
 	private Resources resources;
 	private Method getResourceBagTextMethod; 	
 	private PluralRules rules;
-	private Locale locale;
+	private String language;
+	private boolean treatZero = true;
 
 	public PluralResources( Resources resources ) throws SecurityException, NoSuchMethodException
 	{
 		this.resources = resources;
 		getResourceBagTextMethod = resources.getAssets().getClass().getDeclaredMethod("getResourceBagText", int.class, int.class);
 		getResourceBagTextMethod.setAccessible(true);
-		rules = PluralRules.ruleForLocale(resources.getConfiguration().locale);
 	}
 	
-    public void onConfigurationChanged(Configuration newConfig)
-    {
-        rules = PluralRules.ruleForLocale(newConfig.locale);
-    }
+	public void setTreatZero( boolean treatZero )
+	{
+	    this.treatZero = treatZero;
+	}
 	
     /**
      * Return the string value associated with a particular resource ID for a particular
@@ -59,6 +58,13 @@ public class PluralResources
 	    // if ( Build.SDK_INT > 11 )
 	    //    return resources.getQuantityString(id, quantity);
 	    
+	    Locale locale = resources.getConfiguration().locale;
+	    if ( !locale.getLanguage().equals(language))
+	    {
+	        language = locale.getLanguage(); 
+            rules = PluralRules.ruleForLocale(locale);
+	    }
+	    
 	    if ( rules == null )
 	        return resources.getQuantityString(id, quantity);
 	        
@@ -69,7 +75,7 @@ public class PluralResources
 		try 
 		{
 			// special case -- if translator added special rule for ZERO we disregard language rules
-			if ( quantity == 0 )
+			if ( quantity == 0 && treatZero )
 				format = getResourceBagTextMethod.invoke(resources.getAssets(), new Object [] {id, PluralRules.ID_ZERO} );
 				
 			if ( format == null )
