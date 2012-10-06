@@ -25,6 +25,7 @@ import java.util.Map;
  * object has been integrated to android, we should switch to that.  For now, yuck-o.
  */
 
+@SuppressWarnings("nls")
 abstract public class PluralRules 
 {
     static final int QUANTITY_OTHER = 0x0000;
