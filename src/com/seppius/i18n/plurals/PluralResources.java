@@ -7,6 +7,7 @@ import java.util.Locale;
 import android.content.res.Resources;
 import android.content.res.Resources.*;
 
+@SuppressWarnings("nls")
 public class PluralResources 
 {
 	private Resources resources;
@@ -55,7 +56,7 @@ public class PluralResources
 	{
 	    // Android 3.0 and later have fixed the problem with plurals,
 	    // may consider to use system function, will lose special handling of ZERO though
-	    // if ( Build.SDK_INT > 11 )
+	    // if ( Build.SDK_INT >= 11 )
 	    //    return resources.getQuantityString(id, quantity);
 	    
 	    Locale locale = resources.getConfiguration().locale;
